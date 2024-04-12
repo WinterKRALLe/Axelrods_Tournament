@@ -1,5 +1,9 @@
 package Strategies
 
+import (
+	"math/rand"
+)
+
 func (p *Player) updateYears(opponent Player) {
 	if p.Cooperate && opponent.Cooperate {
 		p.Years += 2
@@ -12,6 +16,38 @@ func (p *Player) updateYears(opponent Player) {
 		p.Years += 5
 		opponent.Years += 0
 	}
+}
+
+func randBool() bool {
+	return rand.Intn(2) == 1
+}
+
+// Pokud player1 udělá 2x D, pak player2 udělá taky D,
+// je to obohaceno o random generator
+func TitForTwoTats() (int, int) {
+	player1 := Player{Cooperate: true, Years: 0}
+	player2 := Player{Cooperate: true, Years: 0}
+
+	player1Defected := 0
+
+	for i := 0; i < numRounds; i++ {
+		if player1Defected == 2 {
+			player1Defected = 0
+			player2.Cooperate = false
+		} else {
+			player2.Cooperate = true
+		}
+
+		player1.updateYears(player2)
+		player2.updateYears(player1)
+
+		player1.Cooperate = randBool()
+		if player1.Cooperate == false {
+			player1Defected++
+		}
+	}
+
+	return player1.Years, player2.Years
 }
 
 func TitForTat() (int, int) {
